@@ -79,6 +79,7 @@ module Asynq
       payload["class"] = klass.to_s
       payload["queue"] = "default"
       payload["args"] = []
+      payload["retry"] = true
       payload["created_at"] = now_in_millis
 
       Candidate.new(self, payload)
