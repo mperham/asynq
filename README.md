@@ -1,9 +1,15 @@
 # Asynq
 
 Asynq provides a simple Ruby API for creating Sidekiq background jobs.
-It's an alternative to `Sidekiq::Client` which is Ractor-safe.
+It's a Ractor-safe alternative to `Sidekiq::Client`.
 
-Note that Asynq does not support any testing modes or batch job creation.
+Note that Asynq purposefully does not have many features.
+Possible future features:
+
+* Bulk job creation
+* Client middleware
+
+Open a new issue and tell us your ideas!
 
 ## Installation
 
