@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.3.0"
 
-  spec.metadata["allowed_push_host"] = "https://gem.coop"
+  spec.metadata["allowed_push_host"] = "https://rubygmes.org"
   spec.metadata["homepage_uri"] = spec.homepage
   # spec.metadata["source_code_uri"] = ""
   # spec.metadata["changelog_uri"] = ""
