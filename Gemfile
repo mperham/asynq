@@ -2,7 +2,7 @@
 
 source "https://gem.coop"
 
-# Specify your gem's dependencies in asink.gemspec
+# Specify your gem's dependencies in asynq.gemspec
 gemspec
 
 group :development do

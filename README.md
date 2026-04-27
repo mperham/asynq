@@ -1,16 +1,16 @@
-# Asink
+# Asynq
 
-Asink provides a simple Ruby API for creating Sidekiq background jobs.
+Asynq provides a simple Ruby API for creating Sidekiq background jobs.
 It's an alternative to `Sidekiq::Client` which is Ractor-safe.
 
-Note that Asink does not support any testing modes or batch job creation.
+Note that Asynq does not support any testing modes or batch job creation.
 
 ## Installation
 
 Add to your application's Gemfile by executing:
 
 ```bash
-bundle add asink
+bundle add asynq
 bundle install
 ```
 
@@ -18,13 +18,13 @@ bundle install
 
 ```ruby
 # Easy mode, uses the default Redis location
-c = Asink::Client.new
+c = Asynq::Client.new
 # Note that passing the Job class in directly does not
 # provide any benefit.
 c.enqueue("MyJob").with_args(123, "mike").now
 
 # Hard mode, configure Redis manually
-c = Asink::Config.new(port: 6380, db: 5).new_client
+c = Asynq::Config.new(port: 6380, db: 5).new_client
 
 result = c.enqueue("SomeJob").
   # Keyword arguments are supported with Sidekiq 8.2

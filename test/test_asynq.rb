@@ -2,9 +2,9 @@
 
 require "test_helper"
 
-class TestAsink < BaseTest
+class TestAsynq < BaseTest
   def test_enqueue_now
-    result = asink.enqueue("MyJob").with_args(123, "bob").with_options(queue: "high").now
+    result = asynq.enqueue("MyJob").with_args(123, "bob").with_options(queue: "high").now
     refute_nil result
     assert_equal 24, result.jid.size
     assert_nil result.error
@@ -17,7 +17,7 @@ class TestAsink < BaseTest
   end
 
   def test_kwargs
-    result = asink.enqueue("MyJob").with_args(123, "bob", foo: "bar").now
+    result = asynq.enqueue("MyJob").with_args(123, "bob", foo: "bar").now
     refute_nil result
     assert_equal 24, result.jid.size
     assert_nil result.error
@@ -31,7 +31,7 @@ class TestAsink < BaseTest
   def test_enqueue_in
     start = Time.now.to_f
 
-    result = asink.enqueue("MyJob").with_args(123, "bob").in(120)
+    result = asynq.enqueue("MyJob").with_args(123, "bob").in(120)
     refute_nil result
     assert_equal 24, result.jid.size
     assert_nil result.error
@@ -46,15 +46,15 @@ class TestAsink < BaseTest
   end
 
   def test_configure
-    c = Asink::Config.new(read_timeout: 1, db: 3)
-    asink = c.new_client
-    refute_nil asink
+    c = Asynq::Config.new(read_timeout: 1, db: 3)
+    asynq = c.new_client
+    refute_nil asynq
   end
 
   def test_ractor
     r = Ractor.new do
-      asink = Asink::Client.new(RedisClient.new)
-      asink.enqueue("MyRactorJob").with_args(123, "bob").in(120)
+      asynq = Asynq::Client.new(RedisClient.new)
+      asynq.enqueue("MyRactorJob").with_args(123, "bob").in(120)
     end
     r.value
 
@@ -67,6 +67,6 @@ class TestAsink < BaseTest
   end
 
   def test_config
-    Asink::Config.new(db: 4, port: 6380).new_client
+    Asynq::Config.new(db: 4, port: 6380).new_client
   end
 end

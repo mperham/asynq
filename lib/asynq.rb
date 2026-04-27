@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
-# require_relative "asink/version"
+# require_relative "asynq/version"
 require "redis_client"
 require "securerandom"
 require "json"
 
-module Asink
+module Asynq
   ##
-  # Asink provides a lightweight, Ractor-safe Sidekiq client for
+  # Asynq provides a lightweight, Ractor-safe Sidekiq client for
   # pushing jobs from any arbitrary Ruby process.
   #
   # Relying on the defaults is simple:
   #
-  #   Asink::Client.new
+  #   Asynq::Client.new
   #
   # Use REDIS_URL to customize the Redis location. More flexible:
   #
-  #   c = Asink::Config.new(db: 0, port: 6379, read_timeout: 3).new_client
+  #   c = Asynq::Config.new(db: 0, port: 6379, read_timeout: 3).new_client
   #
   class Config
     def initialize(url: ENV["REDIS_URL"], **)
@@ -24,14 +24,14 @@ module Asink
     end
 
     def new_client
-      Asink::Client.new(@cfg.new_client)
+      Asynq::Client.new(@cfg.new_client)
     end
   end
 
   ##
-  # An Asink::Client can push jobs to Redis
+  # An Asynq::Client can push jobs to Redis
   #
-  # ac = Asink::Client.new
+  # ac = Asynq::Client.new
   # ac.enqueue(MyJob, "some args", 123).with_options(queue: "easy").now
   # ac.enqueue(MyJob, "some args", 123).with_options(queue: "easy").in(10.minutes)
   #
@@ -47,13 +47,13 @@ module Asink
       end
     end
 
-    Candidate = Struct.new(:asink, :payload) do
+    Candidate = Struct.new(:asynq, :payload) do
       def in(sec)
-        asink.in(sec, payload)
+        asynq.in(sec, payload)
       end
 
       def now
-        asink.now(payload)
+        asynq.now(payload)
       end
 
       def with_options(**kw)
@@ -70,9 +70,9 @@ module Asink
       def jid = payload["jid"]
     end
 
-    # asink = Asink.new
-    # result = asink.enqueue("MyJob").with_args(123, "bob").with_options(queue: "high").in(30.seconds)
-    # result = asink.enqueue(MyJob).with_args(123, "bob").now
+    # asynq = Asynq.new
+    # result = asynq.enqueue("MyJob").with_args(123, "bob").with_options(queue: "high").in(30.seconds)
+    # result = asynq.enqueue(MyJob).with_args(123, "bob").now
     def enqueue(klass)
       payload = {}
       payload["jid"] = SecureRandom.hex(12)
