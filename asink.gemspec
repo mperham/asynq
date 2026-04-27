@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Mike Perham"]
   spec.email = ["mike@perham.net"]
 
-  spec.summary = "A lightweight Sidekiq job creation API"
+  spec.summary = "A lightweight Sidekiq client"
   spec.homepage = "https://sidekiq.org"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.3.0"
@@ -27,11 +27,8 @@ Gem::Specification.new do |spec|
         f.start_with?(*%w[bin/ Gemfile .gitignore test/ .github/ .standard.yml])
     end
   end
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   spec.add_dependency "redis-client", ">= 0.28"
-  spec.add_dependency "connection_pool", ">= 3.0.0"
   spec.add_dependency "json", ">= 2.0.0"
 end
