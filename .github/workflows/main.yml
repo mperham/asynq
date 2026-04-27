@@ -16,6 +16,11 @@ jobs:
         ruby:
           - '4.0.2'
 
+    services:
+      redis:
+        image: valkey:latest
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v4
         with:
