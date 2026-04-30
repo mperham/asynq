@@ -5,6 +5,9 @@ require "redis_client"
 require "securerandom"
 require "json"
 
+require "asynq/version"
+require "asynq/flavor"
+
 module Asynq
   ##
   # Asynq provides a lightweight, Ractor-safe Sidekiq client for
@@ -31,9 +34,15 @@ module Asynq
   ##
   # An Asynq::Client can push jobs to Redis
   #
-  # ac = Asynq::Client.new
-  # ac.enqueue(MyJob, "some args", 123).with_options(queue: "easy").now
-  # ac.enqueue(MyJob, "some args", 123).with_options(queue: "easy").in(10.minutes)
+  #   ac = Asynq::Config.new(**redis_options).new_client
+  #   ac = Asynq::Client.new # use the defaults
+  #
+  # As long as you start with +enqueue(klass)+, the API allows
+  # a variety of calling patterns, allowing you to compose your
+  # jobs fluently.
+  #
+  #   ac.enqueue(MyJob).with_args("something", 123).with_options(queue: "easy").now
+  #   ac.enqueue("MyJob").with_options(queue: "easy").perform("something", 123).in(10.minutes)
   #
   #
   class Client
@@ -41,13 +50,13 @@ module Asynq
       @redis = redis
     end
 
-    Result = Struct.new(:jid, :error) do
+    Result = Data.define(:jid, :error) do
       def success?
         error.nil?
       end
     end
 
-    Candidate = Struct.new(:asynq, :payload) do
+    Candidate = Data.define(:asynq, :payload) do
       def in(sec)
         asynq.in(sec, payload)
       end
@@ -66,6 +75,7 @@ module Asynq
         payload["args"] = args
         self
       end
+      alias_method :perform, :with_args
 
       def jid = payload["jid"]
     end
@@ -80,9 +90,10 @@ module Asynq
       payload["queue"] = "default"
       payload["args"] = []
       payload["retry"] = true
+      payload["flavor"] = "aq"
       payload["created_at"] = now_in_millis
 
-      Candidate.new(self, payload)
+      Candidate.new(asynq: self, payload:)
     end
 
     def now(payload)
@@ -95,7 +106,7 @@ module Asynq
           m.call("rpush", "queue:#{qname}", str)
         end
       end
-      Result.new(payload["jid"])
+      Result.new(jid: payload["jid"], error: nil)
     end
 
     def in(seconds, payload)
@@ -104,7 +115,7 @@ module Asynq
       with do |conn|
         conn.call("zadd", "schedule", at, str)
       end
-      Result.new(payload["jid"])
+      Result.new(jid: payload["jid"], error: nil)
     end
 
     def now_in_millis = ::Process.clock_gettime(::Process::CLOCK_REALTIME, :millisecond)

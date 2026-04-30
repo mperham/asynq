@@ -39,15 +39,20 @@ class TestSidekiq < BaseTest
     assert_payload_equal job1, job2
   end
 
-  def assert_payload_equal(j1, j2)
-    # pp [j1["args"], j2["args"]]
+  EXTRA_KEYS = %w[flavor]
+
+  def assert_payload_equal(s, a)
+    assert_equal s.item.keys.sort, (a.item.keys - EXTRA_KEYS).sort
+    assert_equal "aq", a["flavor"]
+
     %w[retry queue args].each do |attr|
-      assert_equal j1[attr], j2[attr], "Unexpected value for #{attr}"
+      assert_equal s[attr], a[attr], "Unexpected value for #{attr}"
     end
+
     %w[created_at enqueued_at jid].each do |attr|
-      assert j1.item.has_key?(attr), "Missing #{attr}"
-      assert j2.item.has_key?(attr), "Missing #{attr}"
-      assert_equal j1[attr].to_s.size, j2[attr].to_s.size
+      assert s.item.has_key?(attr), "Missing #{attr}"
+      assert a.item.has_key?(attr), "Missing #{attr}"
+      assert_equal s[attr].to_s.size, a[attr].to_s.size
     end
   end
 end
